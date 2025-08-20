@@ -21,7 +21,7 @@
       <g
         id="Vivid-Icons"
         transform="translate(-903.000000, -411.000000)"
-        fill="#FF6E6E"
+        class="fill-yellow-500"
       >
         <g id="Icons" transform="translate(37.000000, 169.000000)">
           <g id="star" transform="translate(858.000000, 234.000000)">

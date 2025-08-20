@@ -11,13 +11,7 @@ import MovieCard from "./components/MovieCard.vue";
 
   <main>
     <div class="container">
-      <div class="grid sm:grid-cols-1 md:grid-cols-2 grid-cols-3 gap-4">
-        <MovieCard /><MovieCard /><MovieCard /><MovieCard />
-        <div class="relative">
-          <IconStar />
-          <span class="absolute">5</span>
-        </div>
-      </div>
+      <MovieCard />
     </div>
   </main>
 </template>
