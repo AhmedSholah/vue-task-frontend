@@ -75,16 +75,14 @@ const props = defineProps<Props>();
         </a-checkbox>
       </a-form-item>
 
-      <a-form-item>
-        <a-button key="back" @click="handleCancel">Cancel</a-button>
-        <a-button
-          key="submit"
-          type="primary"
-          html-type="submit"
-          :loading="false"
+      <!-- <a-form-item style="margin-bottom: 0 !important"> -->
+      <div style="display: flex; justify-content: space-between">
+        <a-button @click="handleCancel">Cancel</a-button>
+        <a-button type="primary" html-type="submit" :loading="false"
           >Create</a-button
         >
-      </a-form-item>
+      </div>
+      <!-- </a-form-item> -->
     </a-form>
   </a-modal>
 </template>
