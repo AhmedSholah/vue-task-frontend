@@ -12,17 +12,12 @@ import Header from "./components/Header/Header.vue";
   </main>
 </template>
 
-<style>
+<style scoped>
 main {
   background-color: #131821;
   min-height: 100vh;
 }
 header {
   background-color: #131821;
-}
-.container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
 }
 </style>

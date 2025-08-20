@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class="container flex justify-between">
+    <div>Total Movies: 3 / Average rating:3.7</div>
     <a-button type="primary" @click="showModal"> Add New Movie </a-button>
   </div>
   <AddMovieModal
