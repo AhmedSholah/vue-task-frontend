@@ -59,8 +59,9 @@ const showModal = () => {
 };
 
 const onFinish = (values: Movie) => {
-  console.log("Success:", values);
-  mutation.mutate(values);
+  const payload = { ...values, rating: 0 };
+  console.log("Success (final payload):", payload);
+  mutation.mutate(payload);
 };
 
 const onFinishFailed = (errorInfo: any) => {

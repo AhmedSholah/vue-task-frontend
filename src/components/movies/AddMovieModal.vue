@@ -46,12 +46,11 @@ const props = defineProps<Props>();
 
       <a-form-item
         label="image"
-        name="imageUrl"
+        name="image"
         :rules="[
           {
             required: true,
             message: 'Please provide an image URL',
-            type: 'url',
           },
         ]"
       >

@@ -1,6 +1,19 @@
 <script setup lang="ts">
+import { useQuery } from "@tanstack/vue-query";
+import { movieService } from "./api/services/movieService";
 import Header from "./components/layout/Header.vue";
 import MovieList from "./components/movies/MovieList.vue";
+import type { Movie } from "./types/movie";
+
+const {
+  isPending,
+  isError,
+  data: movies,
+  error,
+} = useQuery<Movie[]>({
+  queryKey: ["movies"],
+  queryFn: movieService.getMovies,
+});
 </script>
 
 <template>
@@ -10,7 +23,12 @@ import MovieList from "./components/movies/MovieList.vue";
 
   <main>
     <div class="container">
-      <MovieList />
+      <MovieList
+        :movies="movies"
+        :is-pending="isPending"
+        :is-error="isError"
+        :error="error"
+      />
     </div>
   </main>
 </template>
