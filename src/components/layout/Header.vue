@@ -13,43 +13,54 @@
 </template>
 
 <script setup lang="ts">
-import AddMovieModal from "./components/AddMovieModal.vue";
+import { useMutation } from "@tanstack/vue-query";
+import AddMovieModal from "../movies/AddMovieModal.vue";
 import { ref, reactive } from "vue";
+import { queryClient } from "@/lib/queryClient";
+import axios from "axios";
+import type { Movie } from "@/types/movie";
 
 const isModalVisible = ref(false);
 
 const isLoading = ref(false);
 
-export interface FormState {
-  name: string;
-  description: string;
-  imageUrl: string;
-  genres: string[];
-  inTheaters: boolean;
+async function postMovie(values: Movie) {
+  const res = await axios.post("http://localhost:8080/items", values);
+  return res.data;
 }
 
-const formState = reactive<FormState>({
+const mutation = useMutation({
+  mutationFn: postMovie,
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ["movies"] });
+  },
+});
+
+const formState = reactive<Movie>({
   name: "",
   description: "",
-  imageUrl: "",
+  image: "",
   genres: [],
   inTheaters: false,
+  rating: 0,
 });
 
 const resetForm = () => {
   formState.name = "";
   formState.description = "";
-  formState.imageUrl = "";
+  formState.image = "";
   formState.genres = [];
   formState.inTheaters = false;
+  formState.rating = 0;
 };
 
 const showModal = () => {
   isModalVisible.value = true;
 };
 
-const onFinish = (values: FormState) => {
+const onFinish = (values: Movie) => {
   console.log("Success:", values);
+  mutation.mutate(values);
 };
 
 const onFinishFailed = (errorInfo: any) => {

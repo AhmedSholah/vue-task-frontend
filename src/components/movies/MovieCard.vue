@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import IconStar from "./icons/IconStar.vue";
+import type { Movie } from "@/types/movie";
+import IconStar from "../icons/IconStar.vue";
 import { ref, watch } from "vue";
+
+defineProps<{ movie: Movie }>();
 
 const value = ref<number>(0);
 
@@ -19,34 +22,31 @@ watch(value, (newVal, oldVal) => {
             <span
               class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-black font-bold"
             >
-              5
+              {{ movie.rating }}
             </span>
           </span>
         </div>
-        <img
-          alt="example"
-          src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
-        />
+        <img alt="example" :src="movie.image" />
       </div>
     </template>
 
-    <div class="!font-bold text-2xl">Title</div>
+    <div class="!font-bold text-2xl">{{ movie.name }}</div>
 
     <div class="flex flex-wrap gap-2 !my-3">
-      <a-badge count="Crime" :number-style="{ backgroundColor: '#5951dc' }" />
-      <a-badge count="Crime" :number-style="{ backgroundColor: '#5951dc' }" />
-      <a-badge count="Crime" :number-style="{ backgroundColor: '#5951dc' }" />
+      <a-badge
+        count="Crime"
+        :number-style="{ backgroundColor: '#5951dc' }"
+        v-for="genre in movie.genres"
+        :key="genre"
+      />
     </div>
 
     <div>
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Maiores
-      voluptatum veniam officiis laboriosam, blanditiis praesentium nostrum
-      aperiam provident recusandae placeat ab earum, ipsam culpa consequatur
-      architecto commodi sit nemo esse?
+      {{ movie.description }}
     </div>
 
     <div class="flex gap-5 items-center !mt-5">
-      <span>Rating: (0/5)</span>
+      <span>Rating: ({{ movie.rating }}/5)</span>
       <a-rate v-model:value="value" />
     </div>
   </a-card>

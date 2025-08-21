@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import Header from "./components/Header/Header.vue";
-import IconStar from "./components/icons/IconStar.vue";
-import MovieCard from "./components/MovieCard.vue";
+import Header from "./components/layout/Header.vue";
+import MovieList from "./components/movies/MovieList.vue";
 </script>
 
 <template>
@@ -11,7 +10,7 @@ import MovieCard from "./components/MovieCard.vue";
 
   <main>
     <div class="container">
-      <MovieCard />
+      <MovieList />
     </div>
   </main>
 </template>

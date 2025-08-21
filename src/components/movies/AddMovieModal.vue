@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { FormState } from "../Header.vue";
+import type { Movie } from "@/types/movie";
 
 interface Props {
   opened: boolean;
-  formState: FormState;
+  formState: Movie;
   handleCancel: () => void;
-  onFinish: (values: FormState) => void;
+  onFinish: (values: Movie) => void;
   onFinishFailed: (error: any) => void;
 }
 
@@ -47,10 +47,16 @@ const props = defineProps<Props>();
       <a-form-item
         label="image"
         name="imageUrl"
-        :rules="[{ required: true, message: 'Please provide an image URL' }]"
+        :rules="[
+          {
+            required: true,
+            message: 'Please provide an image URL',
+            type: 'url',
+          },
+        ]"
       >
         <a-input
-          v-model:value="formState.imageUrl"
+          v-model:value="formState.image"
           placeholder="e.g., https://example.com/image.jpg"
         />
       </a-form-item>
