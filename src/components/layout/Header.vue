@@ -1,6 +1,9 @@
 <template>
   <div class="container flex justify-between">
-    <div>Total Movies: 3 / Average rating:3.7</div>
+    <div>
+      Total Movies: {{ totalMovies }} / Average rating:
+      {{ averageRating }}
+    </div>
     <a-button type="primary" @click="showModal"> Add New Movie </a-button>
   </div>
   <AddMovieModal
@@ -13,12 +16,13 @@
 </template>
 
 <script setup lang="ts">
-import { useMutation } from "@tanstack/vue-query";
-import AddMovieModal from "../movies/AddMovieModal.vue";
+import { useMutation, useQuery } from "@tanstack/vue-query";
+import AddMovieModal from "../movies/MovieModal.vue";
 import { ref, reactive } from "vue";
 import { queryClient } from "@/lib/queryClient";
 import axios from "axios";
 import type { Movie } from "@/types/movie";
+import { movieService } from "@/api/services/movieService";
 
 const isModalVisible = ref(false);
 
@@ -29,10 +33,32 @@ async function postMovie(values: Movie) {
   return res.data;
 }
 
+const {
+  isPending: isAveragePending,
+  isError: isAverageError,
+  data: averageRating,
+  error: averageError,
+} = useQuery({
+  queryKey: ["averageRating"],
+  queryFn: movieService.getMoviesAverageRating,
+});
+
+const {
+  isPending: isCountPending,
+  isError: isCountError,
+  data: totalMovies,
+  error: countError,
+} = useQuery({
+  queryKey: ["totalMovies"],
+  queryFn: movieService.getMoviesCount,
+});
+
 const mutation = useMutation({
-  mutationFn: postMovie,
+  mutationFn: movieService.createMovie,
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ["movies"] });
+    queryClient.invalidateQueries({ queryKey: ["totalMovies"] });
+    queryClient.invalidateQueries({ queryKey: ["averageRating"] });
   },
 });
 

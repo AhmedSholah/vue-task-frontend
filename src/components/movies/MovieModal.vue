@@ -4,6 +4,7 @@ import type { Movie } from "@/types/movie";
 import { useQuery } from "@tanstack/vue-query";
 
 interface Props {
+  movieId?: number;
   opened: boolean;
   formState: Movie;
   handleCancel: () => void;

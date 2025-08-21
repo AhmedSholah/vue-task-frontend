@@ -1,73 +1,52 @@
 <template>
-  <div class="w-full rounded-lg border border-gray-700 bg-gray-800/50 p-4">
+  <div
+    class="rounded-lg border border-gray-700 bg-gray-800/50 p-4 flex flex-wrap items-center gap-5 !mb-6"
+  >
     <!-- Search -->
-    <div class="relative">
-      <input
-        type="text"
-        v-model="searchQuery"
-        placeholder="Search movies..."
-        class="w-full rounded-md border border-gray-600 bg-gray-900/60 px-10 py-2 text-gray-100 placeholder-gray-400 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-      />
-      <span
-        class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400"
-      >
-        <!-- simple magnifier -->
-        <svg
-          class="h-5 w-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M21 21l-4.35-4.35m1.1-4.4a6.75 6.75 0 11-13.5 0 6.75 6.75 0 0113.5 0z"
-          />
-        </svg>
-      </span>
-    </div>
+    <a-input
+      v-model:value="searchQuery"
+      placeholder="Search..."
+      style="width: 200px"
+    >
+      <template #prefix>
+        <SearchOutlined />
+      </template>
+    </a-input>
 
     <!-- Filters -->
-    <div class="mt-4 flex flex-wrap items-center gap-4">
-      <!-- Genres multi-select -->
-      <select
-        v-model="selectedGenres"
-        multiple
-        class="min-w-[220px] max-w-full rounded-md border border-gray-600 bg-gray-900/60 px-3 py-2 text-gray-100 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-      >
-        <option value="drama">Drama</option>
-        <option value="crime">Crime</option>
-        <option value="action">Action</option>
-        <option value="comedy">Comedy</option>
-        <option value="thriller">Thriller</option>
-        <option value="romance">Romance</option>
-        <option value="sci-fi">Sci‑Fi</option>
-        <option value="horror">Horror</option>
-      </select>
+    <!-- Genres multi-select -->
+    <a-select
+      v-model:value="selectedGenres"
+      mode="multiple"
+      style="width: fit-content; min-width: 200px"
+      placeholder="select genere"
+    >
+      <a-select-option value="drama">Drama</a-select-option>
+      <a-select-option value="crime">Crime</a-select-option>
+      <a-select-option value="action">Action</a-select-option>
+      <a-select-option value="comedy">Comedy</a-select-option>
+    </a-select>
 
-      <!-- In theaters toggle -->
-      <label class="inline-flex items-center gap-2 text-gray-200">
-        <input
-          type="checkbox"
-          v-model="inTheatersOnly"
-          class="h-4 w-4 rounded border-gray-600 bg-gray-900 text-indigo-500 focus:ring-indigo-500"
-        />
-        <span>In theaters only</span>
-      </label>
-    </div>
+    <!-- In theaters toggle -->
+    <!-- <a-checkbox
+      v-model:checked="inTheatersOnly"
+      class="!text-white flex !justify-center !items-center"
+      >In theaters</a-checkbox
+    > -->
+    <a-switch
+      v-model:checked="inTheatersOnly"
+      checked-children="In Theaters Only"
+      un-checked-children="All Movies"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { SearchOutlined } from "@ant-design/icons-vue";
+import { ref, watch, watchEffect } from "vue";
 
 const emit = defineEmits<{
-  (e: "search-change", value: string): void;
-  (
-    e: "filters-change",
-    payload: { genres: string[]; inTheaters: boolean }
-  ): void;
+  (e: "filters-change", payload: { query: string }): void;
 }>();
 
 const searchQuery = ref<string>("");
@@ -75,50 +54,38 @@ const selectedGenres = ref<string[]>([]);
 const inTheatersOnly = ref<boolean>(false);
 
 // Debounce search input (300ms)
-let t: number | undefined;
-watch(searchQuery, (val) => {
-  clearTimeout(t);
-  t = window.setTimeout(() => emit("search-change", val.trim()), 300);
+let t: ReturnType<typeof setTimeout> | undefined;
+const debounceTimeout = 300;
+
+function buildQuery(q: string, genres: string[], inTheaters: boolean) {
+  const params = new URLSearchParams();
+
+  if (q.trim()) {
+    params.append("q", q.trim());
+  }
+
+  genres.forEach((g) => {
+    params.append("genres_like", g);
+  });
+
+  if (inTheaters) {
+    params.append("inTheaters", "true");
+  }
+
+  emit("filters-change", { query: params.toString() });
+  console.log("Query:", params.toString());
+}
+
+// 🔹 Debounce search only
+watch(searchQuery, (q) => {
+  if (t) clearTimeout(t);
+  t = setTimeout(() => {
+    buildQuery(q, selectedGenres.value, inTheatersOnly.value);
+  }, debounceTimeout);
 });
 
-// Emit filter changes immediately
-watch(
-  [selectedGenres, inTheatersOnly],
-  ([genres, inTheaters]) => {
-    emit("filters-change", { genres, inTheaters });
-  },
-  { deep: true }
-);
+// 🔹 Immediate updates for genres and inTheaters
+watch([selectedGenres, inTheatersOnly], ([genres, inTheaters]) => {
+  buildQuery(searchQuery.value, genres, inTheaters);
+});
 </script>
-
-<style scoped>
-.search-filters-container {
-  padding: 16px;
-  background: #fafafa;
-  border-radius: 8px;
-  margin-bottom: 16px;
-}
-
-.search-input {
-  margin-bottom: 16px;
-}
-
-.filters-row {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .filters-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .filters-row .ant-select {
-    min-width: 100% !important;
-  }
-}
-</style>

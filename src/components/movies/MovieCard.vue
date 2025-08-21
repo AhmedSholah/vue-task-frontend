@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Movie } from "@/types/movie";
-import IconStar from "../icons/IconStar.vue";
 import { ref, watch, createVNode, reactive } from "vue";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { queryClient } from "@/lib/queryClient";
@@ -12,7 +11,7 @@ import {
   ExclamationCircleOutlined,
 } from "@ant-design/icons-vue";
 import { Modal } from "ant-design-vue";
-import AddMovieModal from "./AddMovieModal.vue";
+import AddMovieModal from "./MovieModal.vue";
 
 const props = defineProps<{ movie: Movie }>();
 
@@ -22,6 +21,8 @@ const updateMovie = useMutation({
   mutationFn: movieService.updateMovie,
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ["movies"] });
+    queryClient.invalidateQueries({ queryKey: ["totalMovies"] });
+    queryClient.invalidateQueries({ queryKey: ["averageRating"] });
   },
 });
 
@@ -29,6 +30,8 @@ const deleteMovie = useMutation({
   mutationFn: (id: string) => movieService.deleteMovie(id),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ["movies"] });
+    queryClient.invalidateQueries({ queryKey: ["totalMovies"] });
+    queryClient.invalidateQueries({ queryKey: ["averageRating"] });
   },
 });
 
@@ -130,9 +133,9 @@ const handleCancel = () => {
 
     <div class="flex flex-wrap gap-2 !my-3">
       <a-badge
-        count="Crime"
-        :number-style="{ backgroundColor: '#5951dc' }"
         v-for="genre in movie.genres"
+        :count="genre"
+        :number-style="{ backgroundColor: '#5951dc' }"
         :key="genre"
       />
     </div>
