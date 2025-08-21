@@ -3,7 +3,7 @@ export interface Movie {
   name: string;
   description: string;
   image: string;
-  rating: number;
+  rating: number | null;
   genres: string[];
   inTheaters: boolean;
 }

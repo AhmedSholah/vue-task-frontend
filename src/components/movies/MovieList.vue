@@ -21,12 +21,11 @@ const props = defineProps<{
     </div>
     <div v-else-if="isError">Error: {{ error?.message }}</div>
     <div v-else-if="movies && movies.length === 0">No movies found</div>
-    <div v-else>
-      <ul>
-        <li v-for="movie in movies" :key="movie.id">
-          <MovieCard :movie="movie" />
-        </li>
-      </ul>
+    <div
+      v-else
+      class="grid gap-6 grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"
+    >
+      <MovieCard v-for="movie in movies" :key="movie.id" :movie="movie" />
     </div>
   </div>
 </template>

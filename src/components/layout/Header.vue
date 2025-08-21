@@ -59,7 +59,7 @@ const showModal = () => {
 };
 
 const onFinish = (values: Movie) => {
-  const payload = { ...values, rating: 0 };
+  const payload = { ...values, rating: null };
   console.log("Success (final payload):", payload);
   mutation.mutate(payload);
 };

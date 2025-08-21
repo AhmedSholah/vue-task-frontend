@@ -4,6 +4,7 @@ import { movieService } from "./api/services/movieService";
 import Header from "./components/layout/Header.vue";
 import MovieList from "./components/movies/MovieList.vue";
 import type { Movie } from "./types/movie";
+import SearchBar from "./components/common/SearchBar.vue";
 
 const {
   isPending,
@@ -23,6 +24,7 @@ const {
 
   <main>
     <div class="container">
+      <SearchBar />
       <MovieList
         :movies="movies"
         :is-pending="isPending"

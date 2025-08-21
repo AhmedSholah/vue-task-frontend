@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { movieService } from "@/api/services/movieService";
 import type { Movie } from "@/types/movie";
+import { useQuery } from "@tanstack/vue-query";
 
 interface Props {
   opened: boolean;
@@ -9,7 +11,7 @@ interface Props {
   onFinishFailed: (error: any) => void;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 </script>
 
 <template>
@@ -45,7 +47,7 @@ const props = defineProps<Props>();
       </a-form-item>
 
       <a-form-item
-        label="image"
+        label="Image URL"
         name="image"
         :rules="[
           {

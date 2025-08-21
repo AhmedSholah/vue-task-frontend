@@ -7,13 +7,18 @@ export const movieService = {
     return response.data;
   },
 
+  getMovie: async (id: string | undefined) => {
+    const response = await axiosClient.get(`/items/${id}`);
+    return response.data;
+  },
+
   createMovie: async (movie: Movie) => {
     const response = await axiosClient.post("/items", movie);
     return response.data;
   },
 
-  updateMovie: async (id: string, movie: Movie) => {
-    const response = await axiosClient.put(`/items/${id}`, movie);
+  updateMovie: async (movie: Movie) => {
+    const response = await axiosClient.put(`/items/${movie.id}`, movie);
     return response.data;
   },
 
