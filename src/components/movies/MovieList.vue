@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Center from "../common/Center.vue";
 import Loading from "../common/Loading.vue";
 import MovieCard from "./MovieCard.vue";
 import type { Movie } from "@/types/movie";
