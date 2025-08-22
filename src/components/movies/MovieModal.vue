@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/vue-query";
 
 interface Props {
   movieId?: number;
+  type: "add" | "edit";
   opened: boolean;
   formState: Movie;
   handleCancel: () => void;
@@ -12,13 +13,13 @@ interface Props {
   onFinishFailed: (error: any) => void;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 </script>
 
 <template>
   <a-modal
     v-bind:open="opened"
-    title="Add New Movie"
+    :title="type === 'add' ? 'Add New Movie' : `Edit Movie`"
     @cancel="handleCancel"
     centered
     :footer="null"
@@ -83,14 +84,12 @@ defineProps<Props>();
         </a-checkbox>
       </a-form-item>
 
-      <!-- <a-form-item style="margin-bottom: 0 !important"> -->
       <div style="display: flex; justify-content: space-between">
         <a-button @click="handleCancel">Cancel</a-button>
-        <a-button type="primary" html-type="submit" :loading="false"
-          >Create</a-button
-        >
+        <a-button type="primary" html-type="submit" :loading="false">{{
+          type === "add" ? "Create" : "Save"
+        }}</a-button>
       </div>
-      <!-- </a-form-item> -->
     </a-form>
   </a-modal>
 </template>

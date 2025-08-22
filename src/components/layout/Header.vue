@@ -4,10 +4,34 @@
       Total Movies: {{ totalMovies }} / Average rating:
       {{ averageRating }}
     </div>
-    <a-button type="primary" @click="showModal"> Add New Movie </a-button>
+    <div class="flex gap-3">
+      <a-button type="primary" @click="showRemoveRatingsModal">
+        Remove Ratings
+      </a-button>
+      <a-button type="primary" @click="showAddMovieModal">
+        Add New Movie
+      </a-button>
+    </div>
   </div>
-  <AddMovieModal
+
+  <!-- Remove Ratings Confirm Modal -->
+  <a-modal
+    v-model:open="isRemoveRatingsModalVisible"
+    title="Confirm Remove All Ratings"
+    :confirm-loading="isRemovingRatings"
+    @ok="confirmRemoveRatings"
+    @cancel="cancelRemoveRatings"
+  >
+    <p>
+      Are you sure you want to remove all ratings from all movies? This action
+      cannot be undone.
+    </p>
+  </a-modal>
+
+  <!-- Add Movie Modal -->
+  <MovieModal
     :opened="isModalVisible"
+    type="add"
     :form-state="formState"
     :handle-cancel="handleCancel"
     :onFinish="onFinish"
@@ -17,21 +41,17 @@
 
 <script setup lang="ts">
 import { useMutation, useQuery } from "@tanstack/vue-query";
-import AddMovieModal from "../movies/MovieModal.vue";
 import { ref, reactive } from "vue";
 import { queryClient } from "@/lib/queryClient";
-import axios from "axios";
 import type { Movie } from "@/types/movie";
 import { movieService } from "@/api/services/movieService";
+import MovieModal from "../movies/MovieModal.vue";
 
 const isModalVisible = ref(false);
+const isRemoveRatingsModalVisible = ref(false);
+const isRemovingRatings = ref(false);
 
 const isLoading = ref(false);
-
-async function postMovie(values: Movie) {
-  const res = await axios.post("http://localhost:8080/items", values);
-  return res.data;
-}
 
 const {
   isPending: isAveragePending,
@@ -62,6 +82,16 @@ const mutation = useMutation({
   },
 });
 
+const removeRatingsMutation = useMutation({
+  mutationFn: movieService.removeAllRatings,
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ["movies"] });
+    queryClient.invalidateQueries({ queryKey: ["totalMovies"] });
+    queryClient.invalidateQueries({ queryKey: ["averageRating"] });
+    queryClient.invalidateQueries({ queryKey: ["totalMovies", ""] });
+  },
+});
+
 const formState = reactive<Movie>({
   name: "",
   description: "",
@@ -74,14 +104,35 @@ const formState = reactive<Movie>({
 const resetForm = () => {
   formState.name = "";
   formState.description = "";
+  formState.description = "";
   formState.image = "";
   formState.genres = [];
   formState.inTheaters = false;
   formState.rating = 0;
 };
 
-const showModal = () => {
+const showAddMovieModal = () => {
   isModalVisible.value = true;
+};
+
+const showRemoveRatingsModal = () => {
+  isRemoveRatingsModalVisible.value = true;
+};
+
+const confirmRemoveRatings = async () => {
+  isRemovingRatings.value = true;
+  try {
+    await removeRatingsMutation.mutateAsync();
+    isRemoveRatingsModalVisible.value = false;
+  } catch (error) {
+    console.error("Failed to remove ratings:", error);
+  } finally {
+    isRemovingRatings.value = false;
+  }
+};
+
+const cancelRemoveRatings = () => {
+  isRemoveRatingsModalVisible.value = false;
 };
 
 const onFinish = (values: Movie) => {

@@ -19,7 +19,7 @@
       v-model:value="selectedGenres"
       mode="multiple"
       style="width: fit-content; min-width: 200px"
-      placeholder="select genere"
+      placeholder="Select generes"
     >
       <a-select-option value="drama">Drama</a-select-option>
       <a-select-option value="crime">Crime</a-select-option>
@@ -28,22 +28,24 @@
     </a-select>
 
     <!-- In theaters toggle -->
-    <!-- <a-checkbox
-      v-model:checked="inTheatersOnly"
-      class="!text-white flex !justify-center !items-center"
-      >In theaters</a-checkbox
-    > -->
     <a-switch
       v-model:checked="inTheatersOnly"
       checked-children="In Theaters Only"
       un-checked-children="All Movies"
     />
+
+    <!-- Clear Filters Button -->
+    <div v-if="hasActiveFilters">
+      <a-button @click="clearFilters" class="ml-auto" danger>
+        Clear Filters
+      </a-button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { SearchOutlined } from "@ant-design/icons-vue";
-import { ref, watch, watchEffect } from "vue";
+import { ref, watch, computed } from "vue";
 
 const emit = defineEmits<{
   (e: "filters-change", payload: { query: string }): void;
@@ -52,6 +54,15 @@ const emit = defineEmits<{
 const searchQuery = ref<string>("");
 const selectedGenres = ref<string[]>([]);
 const inTheatersOnly = ref<boolean>(false);
+
+// Computed property to check if there are any active filters
+const hasActiveFilters = computed(() => {
+  return (
+    searchQuery.value.trim() !== "" ||
+    selectedGenres.value.length > 0 ||
+    inTheatersOnly.value
+  );
+});
 
 // Debounce search input (300ms)
 let t: ReturnType<typeof setTimeout> | undefined;
@@ -76,7 +87,13 @@ function buildQuery(q: string, genres: string[], inTheaters: boolean) {
   console.log("Query:", params.toString());
 }
 
-// 🔹 Debounce search only
+const clearFilters = () => {
+  searchQuery.value = "";
+  selectedGenres.value = [];
+  inTheatersOnly.value = false;
+  emit("filters-change", { query: "" });
+};
+
 watch(searchQuery, (q) => {
   if (t) clearTimeout(t);
   t = setTimeout(() => {
@@ -84,7 +101,6 @@ watch(searchQuery, (q) => {
   }, debounceTimeout);
 });
 
-// 🔹 Immediate updates for genres and inTheaters
 watch([selectedGenres, inTheatersOnly], ([genres, inTheaters]) => {
   buildQuery(searchQuery.value, genres, inTheaters);
 });

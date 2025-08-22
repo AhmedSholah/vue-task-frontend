@@ -11,11 +11,18 @@ import {
   ExclamationCircleOutlined,
 } from "@ant-design/icons-vue";
 import { Modal } from "ant-design-vue";
-import AddMovieModal from "./MovieModal.vue";
+import MovieModal from "./MovieModal.vue";
 
 const props = defineProps<{ movie: Movie }>();
 
 const value = ref<number>(props.movie.rating || 0);
+
+watch(
+  () => props.movie.rating,
+  (newRating) => {
+    value.value = newRating || 0;
+  }
+);
 
 const updateMovie = useMutation({
   mutationFn: movieService.updateMovie,
@@ -168,8 +175,9 @@ const handleCancel = () => {
     </div>
   </a-card>
 
-  <AddMovieModal
+  <MovieModal
     :opened="isModalVisible"
+    type="edit"
     :form-state="formState"
     :handle-cancel="handleCancel"
     :onFinish="onFinish"
