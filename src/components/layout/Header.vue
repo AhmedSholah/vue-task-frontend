@@ -1,5 +1,7 @@
 <template>
-  <div class="container flex justify-between">
+  <div
+    class="container flex flex-col items-center gap-5 md:flex-row md:justify-between !py-12"
+  >
     <div>
       Total Movies: {{ totalMovies }} / Average rating:
       {{ averageRating }}
@@ -47,6 +49,10 @@ import { queryClient } from "@/lib/queryClient";
 import type { Movie } from "@/types/movie";
 import { movieService } from "@/api/services/movieService";
 import MovieModal from "../movies/MovieModal.vue";
+import {
+  showErrorNotification,
+  showSuccessNotification,
+} from "@/utils/notifications";
 
 const isModalVisible = ref(false);
 const isRemoveRatingsModalVisible = ref(false);
@@ -143,10 +149,18 @@ const onFinish = async (values: Movie) => {
   console.log("Success (final payload):", payload);
   await createMovie.mutateAsync(payload);
   handleCancel();
+  showSuccessNotification(
+    "Movie Added Successfully",
+    "The movie has been added to your collection."
+  );
 };
 
 const onFinishFailed = (errorInfo: any) => {
   console.log("Failed:", errorInfo);
+  showErrorNotification(
+    "Failed to Add Movie",
+    "There was an error adding the movie to your collection. Please try again."
+  );
 };
 
 const handleCancel = () => {

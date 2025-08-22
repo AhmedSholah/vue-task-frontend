@@ -12,6 +12,10 @@ import {
 } from "@ant-design/icons-vue";
 import { Modal } from "ant-design-vue";
 import MovieModal from "./MovieModal.vue";
+import {
+  showErrorNotification,
+  showSuccessNotification,
+} from "@/utils/notifications";
 // import { notification } from "ant-design-vue";
 // const openNotificationWithIcon = (type: string) => {
 //   notification[type]({
@@ -51,6 +55,16 @@ const deleteMovie = useMutation({
     queryClient.invalidateQueries({ queryKey: ["movies"] });
     queryClient.invalidateQueries({ queryKey: ["totalMovies"] });
     queryClient.invalidateQueries({ queryKey: ["averageRating"] });
+    showSuccessNotification(
+      "Movie Deleted Successfully",
+      "The movie has been removed from your collection."
+    );
+  },
+  onError: () => {
+    showErrorNotification(
+      "Failed to Delete Movie",
+      "There was an error removing the movie from your collection. Please try again."
+    );
   },
 });
 
@@ -107,11 +121,18 @@ const onFinish = async (values: Movie) => {
   const payload = { ...values, id: props.movie.id, rating: props.movie.rating };
   await updateMovie.mutateAsync(payload);
   handleCancel();
-  // openNotificationWithIcon("success");
+  showSuccessNotification(
+    "Movie Updated Successfully",
+    "The changes to the movie have been saved."
+  );
 };
 
 const onFinishFailed = (errorInfo: any) => {
   console.log("Failed:", errorInfo);
+  showErrorNotification(
+    "Failed to Update Movie",
+    "There was an error saving the changes. Please try again."
+  );
 };
 
 const handleCancel = () => {
@@ -173,20 +194,26 @@ const handleCancel = () => {
     <div
       class="absolute bottom-5 right-5 flex gap-2 items-center !mt-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
     >
-      <a-button
-        type="text"
-        @click="handleEdit"
-        class="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center p-0 border-0 shadow-sm"
-      >
-        <EditFilled class="text-black text-lg" />
-      </a-button>
-      <a-button
-        type="text"
-        @click="handleDelete"
-        class="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center p-0 border-0 shadow-sm"
-      >
-        <DeleteFilled class="text-black text-lg" />
-      </a-button>
+      <a-tooltip>
+        <template #title>Edit Movie</template>
+        <a-button
+          type="text"
+          @click="handleEdit"
+          class="!w-12 !h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center p-0 border-0 shadow-sm"
+        >
+          <EditFilled class="text-black text-lg" />
+        </a-button>
+      </a-tooltip>
+      <a-tooltip>
+        <template #title>Delete Movie</template>
+        <a-button
+          type="text"
+          @click="handleDelete"
+          class="!w-12 !h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center p-0 border-0 shadow-sm"
+        >
+          <DeleteFilled class="text-black text-lg" />
+        </a-button>
+      </a-tooltip>
     </div>
   </a-card>
 

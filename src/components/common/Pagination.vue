@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-center !mt-6">
+  <div class="flex justify-center !my-5">
     <a-pagination
       v-model:current="currentPage"
       :total="total"
