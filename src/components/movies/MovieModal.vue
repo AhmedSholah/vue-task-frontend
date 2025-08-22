@@ -7,6 +7,7 @@ interface Props {
   movieId?: number;
   type: "add" | "edit";
   opened: boolean;
+  isLoading: boolean;
   formState: Movie;
   handleCancel: () => void;
   onFinish: (values: Movie) => void;
@@ -86,7 +87,7 @@ const props = defineProps<Props>();
 
       <div style="display: flex; justify-content: space-between">
         <a-button @click="handleCancel">Cancel</a-button>
-        <a-button type="primary" html-type="submit" :loading="false">{{
+        <a-button type="primary" html-type="submit" :loading="isLoading">{{
           type === "add" ? "Create" : "Save"
         }}</a-button>
       </div>

@@ -12,10 +12,19 @@ import {
 } from "@ant-design/icons-vue";
 import { Modal } from "ant-design-vue";
 import MovieModal from "./MovieModal.vue";
+import { notification } from "ant-design-vue";
+const openNotificationWithIcon = (type: string) => {
+  notification[type]({
+    message: "Movie Updated",
+    description: "The movie data has been updated successfully.",
+  });
+};
 
 const props = defineProps<{ movie: Movie }>();
 
 const value = ref<number>(props.movie.rating || 0);
+const isModalVisible = ref(false);
+const isLoading = ref(false);
 
 watch(
   () => props.movie.rating,
@@ -26,6 +35,9 @@ watch(
 
 const updateMovie = useMutation({
   mutationFn: movieService.updateMovie,
+  onMutate: () => {
+    isLoading.value = true;
+  },
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ["movies"] });
     queryClient.invalidateQueries({ queryKey: ["totalMovies"] });
@@ -68,8 +80,6 @@ const handleDelete = () => {
   });
 };
 
-const isModalVisible = ref(false);
-
 const formState = reactive<Movie>({
   name: "",
   description: "",
@@ -93,9 +103,11 @@ const showEditModal = (movieId: number | undefined) => {
   Object.assign(formState, props.movie);
 };
 
-const onFinish = (values: Movie) => {
+const onFinish = async (values: Movie) => {
   const payload = { ...values, id: props.movie.id, rating: props.movie.rating };
-  updateMovie.mutate(payload);
+  await updateMovie.mutateAsync(payload);
+  handleCancel();
+  openNotificationWithIcon("success");
 };
 
 const onFinishFailed = (errorInfo: any) => {
@@ -104,6 +116,7 @@ const onFinishFailed = (errorInfo: any) => {
 
 const handleCancel = () => {
   isModalVisible.value = false;
+  isLoading.value = false;
   resetForm();
 };
 </script>
@@ -147,8 +160,10 @@ const handleCancel = () => {
       />
     </div>
 
-    <div>
-      {{ movie.description }}
+    <div
+      class="line-clamp-3 overflow-hidden min-h-[2rem] leading-relaxed w-full break-words"
+    >
+      {{ movie.description || "No Description Provided" }}
     </div>
 
     <div class="flex gap-1 items-center !mt-5">
@@ -178,6 +193,7 @@ const handleCancel = () => {
   <MovieModal
     :opened="isModalVisible"
     type="edit"
+    :isLoading="isLoading"
     :form-state="formState"
     :handle-cancel="handleCancel"
     :onFinish="onFinish"

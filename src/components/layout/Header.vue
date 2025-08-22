@@ -32,6 +32,7 @@
   <MovieModal
     :opened="isModalVisible"
     type="add"
+    :isLoading="isLoading"
     :form-state="formState"
     :handle-cancel="handleCancel"
     :onFinish="onFinish"
@@ -41,7 +42,7 @@
 
 <script setup lang="ts">
 import { useMutation, useQuery } from "@tanstack/vue-query";
-import { ref, reactive } from "vue";
+import { ref, reactive, computed } from "vue";
 import { queryClient } from "@/lib/queryClient";
 import type { Movie } from "@/types/movie";
 import { movieService } from "@/api/services/movieService";
@@ -50,7 +51,6 @@ import MovieModal from "../movies/MovieModal.vue";
 const isModalVisible = ref(false);
 const isRemoveRatingsModalVisible = ref(false);
 const isRemovingRatings = ref(false);
-
 const isLoading = ref(false);
 
 const {
@@ -73,8 +73,11 @@ const {
   queryFn: movieService.getMoviesCount,
 });
 
-const mutation = useMutation({
+const createMovie = useMutation({
   mutationFn: movieService.createMovie,
+  onMutate: () => {
+    isLoading.value = true;
+  },
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ["movies"] });
     queryClient.invalidateQueries({ queryKey: ["totalMovies"] });
@@ -135,10 +138,11 @@ const cancelRemoveRatings = () => {
   isRemoveRatingsModalVisible.value = false;
 };
 
-const onFinish = (values: Movie) => {
+const onFinish = async (values: Movie) => {
   const payload = { ...values, rating: null };
   console.log("Success (final payload):", payload);
-  mutation.mutate(payload);
+  await createMovie.mutateAsync(payload);
+  handleCancel();
 };
 
 const onFinishFailed = (errorInfo: any) => {
@@ -147,6 +151,7 @@ const onFinishFailed = (errorInfo: any) => {
 
 const handleCancel = () => {
   isModalVisible.value = false;
+  isLoading.value = false;
   resetForm();
 };
 </script>
