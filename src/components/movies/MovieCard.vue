@@ -12,13 +12,13 @@ import {
 } from "@ant-design/icons-vue";
 import { Modal } from "ant-design-vue";
 import MovieModal from "./MovieModal.vue";
-import { notification } from "ant-design-vue";
-const openNotificationWithIcon = (type: string) => {
-  notification[type]({
-    message: "Movie Updated",
-    description: "The movie data has been updated successfully.",
-  });
-};
+// import { notification } from "ant-design-vue";
+// const openNotificationWithIcon = (type: string) => {
+//   notification[type]({
+//     message: "Movie Updated",
+//     description: "The movie data has been updated successfully.",
+//   });
+// };
 
 const props = defineProps<{ movie: Movie }>();
 
@@ -107,7 +107,7 @@ const onFinish = async (values: Movie) => {
   const payload = { ...values, id: props.movie.id, rating: props.movie.rating };
   await updateMovie.mutateAsync(payload);
   handleCancel();
-  openNotificationWithIcon("success");
+  // openNotificationWithIcon("success");
 };
 
 const onFinishFailed = (errorInfo: any) => {
